@@ -1,0 +1,33 @@
+services:
+  nginx:
+    container_name: weibull-nginx
+    image: nginx:stable
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./:/var/www:cached 
+      - ./logs/nginx_error.log:/var/www/logs/nginx_error.log
+      - ./logs/nginx_access.log:/var/www/logs/nginx_access.log
+    depends_on:
+      - php
+
+  php:
+    container_name: weibull-php
+    build: 
+      dockerfile: ./docker/php/php.dockerfile
+    volumes:
+      - ./:/var/www
+    expose:
+      - '9000'
+    depends_on:
+      - mysql
+
+  mysql:
+    image: mysql:8.0
+    container_name: weibull-mysql
+    volumes:
+      - ./docker/db/data:/var/lib/mysql
+      - ./docker/db/db-init.sql:/docker-entrypoint-initdb.d/init.sql 
+    env_file:
+      - ./docker/db/database.env
+    
+    

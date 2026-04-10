@@ -1,0 +1,25 @@
+{
+    "name": "kot_baun/weibull-model",
+    "description": "Your ad may be here.",
+    "type": "project",
+    "require": {
+        "php": ">=8.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\Core\\": "src/Core/",
+            "App\\Facades\\": "src/Facades/",
+            "App\\Controllers\\": "src/Controllers/",
+            "App\\Helpers\\": "src/Helpers/",
+            "App\\Models\\": "src/Models/",
+            "App\\Services\\": "src/Services/",
+            "Config\\": "config/"
+        },
+        "files": [
+            "config/constants.php"
+        ]
+    },
+    "config": {
+        "optimize-autoloader": true
+    }
+}
