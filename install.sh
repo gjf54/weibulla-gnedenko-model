@@ -85,6 +85,19 @@ run_make_init() {
     make init
 }
 
+get_server_ip() {
+    if command -v curl &>/dev/null; then
+        IP=$(curl -s --max-time 2 ifconfig.me 2>/dev/null || true)
+    fi
+    if [ -z "$IP" ] && command -v wget &>/dev/null; then
+        IP=$(wget -qO- --timeout=2 ifconfig.me 2>/dev/null || true)
+    fi
+    if [ -z "$IP" ]; then
+        IP=$(hostname -I | awk '{print $1}')
+    fi
+    echo "$IP"
+}
+
 main() {
     info "Starting bootstrap for $REPO_URL on $OS"
     install_base_packages
@@ -92,8 +105,12 @@ main() {
     install_docker_compose
     clone_repo
     run_make_init
-    info "Installation completed successfully!"
+    info "Install completed"
     info "Project is ready at $PROJECT_DIR"
+    info "URL: http://${SERVER_IP}:${APP_PORT}"
 }
+
+SERVER_IP=$(get_server_ip)
+APP_PORT=8090
 
 main
