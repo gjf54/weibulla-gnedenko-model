@@ -11,49 +11,16 @@ class ComposerStaticInita4400ea58033cefc1f49638b1863fc5e
     );
 
     public static $prefixLengthsPsr4 = array (
-        'C' =>
+        'A' => 
         array (
-            'Config\\' => 7,
-        ),
-        'A' =>
-        array (
-            'App\\Services\\' => 13,
-            'App\\Models\\' => 11,
-            'App\\Helpers\\' => 12,
-            'App\\Facades\\' => 12,
-            'App\\Core\\' => 9,
-            'App\\Controllers\\' => 16,
+            'App\\' => 4,
         ),
     );
 
     public static $prefixDirsPsr4 = array (
-        'Config\\' =>
+        'App\\' => 
         array (
-            0 => __DIR__ . '/../..' . '/config',
-        ),
-        'App\\Services\\' =>
-        array (
-            0 => __DIR__ . '/../..' . '/src/Services',
-        ),
-        'App\\Models\\' =>
-        array (
-            0 => __DIR__ . '/../..' . '/src/Models',
-        ),
-        'App\\Helpers\\' =>
-        array (
-            0 => __DIR__ . '/../..' . '/src/Helpers',
-        ),
-        'App\\Facades\\' =>
-        array (
-            0 => __DIR__ . '/../..' . '/src/Facades',
-        ),
-        'App\\Core\\' =>
-        array (
-            0 => __DIR__ . '/../..' . '/src/Core',
-        ),
-        'App\\Controllers\\' =>
-        array (
-            0 => __DIR__ . '/../..' . '/src/Controllers',
+            0 => __DIR__ . '/../..' . '/src',
         ),
     );
 
@@ -65,7 +32,9 @@ class ComposerStaticInita4400ea58033cefc1f49638b1863fc5e
         'App\\Core\\Response' => __DIR__ . '/../..' . '/src/Core/Response.php',
         'App\\Core\\Router' => __DIR__ . '/../..' . '/src/Core/Router.php',
         'App\\Core\\View' => __DIR__ . '/../..' . '/src/Core/View.php',
+        'App\\Entity\\MachinesStatus' => __DIR__ . '/../..' . '/src/Entity/MachinesStatus.php',
         'App\\Facades\\DB' => __DIR__ . '/../..' . '/src/Facades/DB.php',
+        'App\\Facades\\DatabaseManager' => __DIR__ . '/../..' . '/src/Facades/DatabaseManager.php',
         'App\\Facades\\Statistics' => __DIR__ . '/../..' . '/src/Facades/Statistics.php',
         'App\\Helpers\\EnvHelper' => __DIR__ . '/../..' . '/src/Helpers/EnvHelper.php',
         'App\\Helpers\\FormatHelper' => __DIR__ . '/../..' . '/src/Helpers/FormatHelper.php',

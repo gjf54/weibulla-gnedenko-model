@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Entity\MachinesStatus;
 use App\Helpers\RandomGeneratorHelper;
 use App\Helpers\WeibullCalculatorHelper;
 use App\Models\RepairJob;
@@ -33,12 +34,12 @@ class StepProcessorService
         $workingCount = 0;
         
         foreach ($newMachines as $num => $machine) {
-            if ($machine->status === 'working') {
+            if ($machine->status === MachinesStatus::WORKING->value) {
                 $machine->remaining -= $stepHours;
                 $workingCount++;
                 
                 if ($machine->remaining <= 0) {
-                    $machine->status = 'waiting';
+                    $machine->status = MachinesStatus::WAITING->value;
                     $machine->failure_step = $stepCounter;
                     $machine->remaining = 0;
                     
@@ -69,7 +70,7 @@ class StepProcessorService
                     
                     $newLifetime = WeibullCalculatorHelper::generateWorkTime($this->k_repair, $this->theta_repair);
                     
-                    $machine->status = 'working';
+                    $machine->status = MachinesStatus::WORKING->value;
                     $machine->remaining = $newLifetime;
                     $machine->repair_count++;
                     $machine->repair_remaining = 0;
@@ -80,13 +81,13 @@ class StepProcessorService
                         $historyCallback($machineNum, $stepCounter, 'repair_complete', "Отремонтирован на шаге $stepCounter");
                     }
                 } else {
-                    $machine->status = 'repair';
+                    $machine->status = MachinesStatus::REPAIR->value;
                     $machine->repair_remaining = $job->repair_remaining;
                     $machine->repair_time = $job->repair_time;
                     $tempQueue[] = $job;
                 }
             } else {
-                $machine->status = 'waiting';
+                $machine->status = MachinesStatus::WAITING->value;
                 $machine->repair_remaining = $job->repair_remaining;
                 $machine->repair_time = $job->repair_time;
                 $machine->total_downtime += $stepHours;
@@ -95,7 +96,7 @@ class StepProcessorService
         }
         
         foreach ($newMachines as $machine) {
-            if ($machine->status === 'repair' || $machine->status === 'waiting') {
+            if ($machine->status === 'repair' || $machine->status === MachinesStatus::WAITING->value) {
                 $machine->total_downtime += $stepHours;
             }
         }

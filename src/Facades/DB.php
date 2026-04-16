@@ -139,18 +139,32 @@ class DB {
     public function getStepsStats(): array 
     {
         $query = "SELECT 
-                    COUNT(*) as total_steps,
-                    COALESCE(AVG(working_machines), 0) as avg_working,
-                    COALESCE(AVG(repair_machines), 0) as avg_repair,
-                    COALESCE(AVG(waiting_machines), 0) as avg_waiting,
-                    COALESCE(AVG(queue_length), 0) as avg_queue,
-                    COALESCE(SUM(total_repairs), 0) as total_repairs_all,
-                    COALESCE(AVG(total_profit), 0) as avg_profit,
-                    COALESCE(MAX(total_profit), 0) as max_profit,
-                    COALESCE(MIN(total_profit), 0) as min_profit,
-                    COALESCE(AVG(total_downtime), 0) as avg_downtime,
-                    COALESCE(AVG(period_profit), 0) as avg_period_profit
-                  FROM simulation_steps";
+                COUNT(*) as total_steps,
+                COALESCE(AVG(working_machines), 0) as avg_working,
+                COALESCE(AVG(repair_machines), 0) as avg_repair,
+                COALESCE(AVG(waiting_machines), 0) as avg_waiting,
+                COALESCE(AVG(queue_length), 0) as avg_queue,
+                COALESCE((
+                    SELECT SUM(final_repairs)
+                    FROM (
+                        SELECT MAX(total_repairs) as final_repairs
+                        FROM simulation_steps
+                        GROUP BY session_id
+                    ) as fr
+                ), 0) as total_repairs_all,
+                COALESCE((
+                    SELECT AVG(final_downtime / machines_count)
+                    FROM (
+                        SELECT 
+                            MAX(st.total_downtime) as final_downtime,
+                            MAX(s.machines_count) as machines_count
+                        FROM simulation_steps st
+                        JOIN simulation_sessions s ON st.session_id = s.id
+                        GROUP BY st.session_id
+                    ) as fd
+                ), 0) as avg_downtime,
+                COALESCE(AVG(period_profit), 0) as avg_period_profit
+            FROM simulation_steps";
         
         $result = $this->query($query);
         return $result ? $result->fetch_assoc() : [];
@@ -298,29 +312,29 @@ class DB {
         return $data;
     }
 
-    public function getStatusDistribution(): array 
+   public function getStatusDistribution(): array
     {
         $stats = ['working' => 0, 'repair' => 0, 'waiting' => 0];
-        
-        $query = "SELECT 
-                    status,
-                    COUNT(*) as count
-                  FROM machines_state
-                  WHERE step_id IN (
-                      SELECT MAX(id) 
-                      FROM simulation_steps 
-                      GROUP BY session_id
-                  )
-                  GROUP BY status";
-        
+
+        $query = "SELECT ms.status, COUNT(*) as cnt
+                FROM machines_state ms
+                INNER JOIN (
+                    SELECT session_id, MAX(step_number) as max_step
+                    FROM simulation_steps
+                    GROUP BY session_id
+                ) last_step ON ms.step_id = (
+                    SELECT id FROM simulation_steps 
+                    WHERE session_id = last_step.session_id AND step_number = last_step.max_step 
+                    LIMIT 1
+                )
+                GROUP BY ms.status";
+
         $result = $this->query($query);
-        
         if ($result) {
             while ($row = $result->fetch_assoc()) {
-                $stats[$row['status']] = (int)$row['count'];
+                $stats[$row['status']] = (int)$row['cnt'];
             }
         }
-        
         return $stats;
     }
 
@@ -333,7 +347,8 @@ class DB {
                     COUNT(*) as total_repair_jobs,
                     COALESCE(AVG(repair_remaining), 0) as avg_repair_remaining,
                     COUNT(DISTINCT machine_number) as unique_machines_repaired
-                  FROM repair_queue_state";
+                  FROM repair_queue_state
+                  WHERE repair_remaining <= 1";
         
         $result = $this->query($query);
         return $result ? $result->fetch_assoc() : [];
@@ -416,6 +431,21 @@ class DB {
         
         $stmt->close();
         return $history;
+    }
+
+    public function getProfitStats(): array
+    {
+        $query = "SELECT 
+                    COALESCE(AVG(final_profit), 0) as avg_profit,
+                    COALESCE(MAX(final_profit), 0) as max_profit,
+                    COALESCE(MIN(final_profit), 0) as min_profit
+                  FROM (
+                      SELECT MAX(total_profit) as final_profit
+                      FROM simulation_steps
+                      GROUP BY session_id
+                  ) as session_profits";
+        $result = $this->query($query);
+        return $result ? $result->fetch_assoc() : [];
     }
 
     public function getWeibullStats(): array 
@@ -565,17 +595,18 @@ class DB {
         return $result;
     }
 
-    public function getDashboardSummary(): array 
+    public function getDashboardSummary(): array
     {
         return [
             'sessions' => $this->getAllSessions(),
             'steps_stats' => $this->getStepsStats(),
             'param_stats' => $this->getParameterStats(),
+            'profit_stats' => $this->getProfitStats(),
             'top_sessions' => $this->getTopProfitSessions(5),
             'status_distribution' => $this->getStatusDistribution(),
             'repair_stats' => $this->getRepairStats(),
             'hourly_stats' => $this->getHourlyStats(),
-            'efficiency' => $this->getEfficiencyStats()
+            'efficiency' => $this->getEfficiencyStats(),
         ];
     }
 

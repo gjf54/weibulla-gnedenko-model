@@ -14,15 +14,12 @@ if (PHP_VERSION_ID < 50600) {
             echo $err;
         }
     }
-    throw new RuntimeException($err);
+    trigger_error(
+        $err,
+        E_USER_ERROR
+    );
 }
 
 require_once __DIR__ . '/composer/autoload_real.php';
-
-require_once __DIR__ . '/../src/Helpers/EnvHelper.php';
-
-\App\Helpers\EnvHelper::load();
-
-require_once __DIR__ . '/../config/constants.php';
 
 return ComposerAutoloaderInita4400ea58033cefc1f49638b1863fc5e::getLoader();

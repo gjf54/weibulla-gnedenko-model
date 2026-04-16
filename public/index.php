@@ -1,5 +1,11 @@
 <?php
 
+require_once __DIR__ . '/../src/Helpers/EnvHelper.php';
+
+\App\Helpers\EnvHelper::load();
+
+require_once __DIR__ . '/../config/constants.php';
+
 require_once __DIR__ . '/../vendor/autoload.php';
 
 use App\Core\Router;

@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Entity\MachinesStatus;
 use App\Models\Machine;
 use App\Models\RepairJob;
 use App\Helpers\WeibullCalculatorHelper;
@@ -59,8 +60,8 @@ class SimulationService
     
     private function initializeMachines(): void
     {
-        $workTime = WeibullCalculatorHelper::generateWorkTime($this->k_work, $this->theta_work);
         for ($i = 1; $i <= $this->machinesCount; $i++) {
+            $workTime = WeibullCalculatorHelper::generateWorkTime($this->k_work, $this->theta_work);
             $this->machines[$i] = new Machine($i, RandomGeneratorHelper::getU(), $workTime);
         }
         $this->updateStatusCaches();
@@ -73,9 +74,9 @@ class SimulationService
         $this->waitingCache = [];
         
         foreach ($this->machines as $num => $machine) {
-            if ($machine->status === 'working') {
+            if ($machine->status === MachinesStatus::WORKING->value) {
                 $this->workingCache[] = $num;
-            } elseif ($machine->status === 'repair') {
+            } elseif ($machine->status === MachinesStatus::REPAIR->value) {
                 $this->repairCache[] = $num;
             } else {
                 $this->waitingCache[] = $num;

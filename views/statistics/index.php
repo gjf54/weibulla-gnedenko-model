@@ -54,11 +54,11 @@ $avgProfitPerStep = ($dashboard['steps_stats']['total_steps'] ?? 0) > 0
         <div class="card">
             <div class="card-body text-center">
                 <div class="display-6 text-success mb-2"><i class="fas fa-ruble-sign"></i></div>
-                <h3 class="mb-0 <?= ($dashboard['steps_stats']['avg_profit'] ?? 0) >= 0 ? 'text-success' : 'text-danger' ?>">
-                    <?= number_format($dashboard['steps_stats']['avg_profit'] ?? 0, 0, '.', ' ') ?>
+                <h3 class="mb-0 <?= ($dashboard['profit_stats']['avg_profit'] ?? 0) >= 0 ? 'text-success' : 'text-danger' ?>">
+                    <?= number_format($dashboard['profit_stats']['avg_profit'] ?? 0, 0, '.', ' ') ?>
                 </h3>
                 <p class="text-muted mb-0">Средняя прибыль</p>
-                <small class="text-success">▲ макс: <?= number_format($dashboard['steps_stats']['max_profit'] ?? 0, 0, '.', ' ') ?></small>
+                <small class="text-success">▲ макс: <?= number_format($dashboard['profit_stats']['max_profit'] ?? 0, 0, '.', ' ') ?></small>
             </div>
         </div>
     </div>

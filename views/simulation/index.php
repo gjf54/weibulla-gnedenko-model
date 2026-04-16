@@ -135,7 +135,7 @@ $theta_repair = $data['theta_repair'] ?? 0;
                 <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                     <span><i class="fas fa-chart-simple me-2"></i>Управление симуляцией</span>
                     <div>
-                        <strong>Шаг: <?= $simulation->getStepCounter() ?></strong> |
+                        <strong>Шаг: <?= $simulation->getStepCounter() + 1 ?></strong> |
                         <strong>Прибыль: <?= number_format($total_profit, 2) ?> ₽</strong> |
                         <strong>Время: <?= $simulation->getStepCounter() * $simulation->getStepHours() ?> ч</strong>
                     </div>
