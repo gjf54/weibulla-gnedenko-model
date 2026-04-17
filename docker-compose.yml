@@ -5,8 +5,7 @@ services:
     volumes:
       - ./docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
       - ./:/var/www:cached 
-      - ./logs/nginx_error.log:/var/www/logs/nginx_error.log
-      - ./logs/nginx_access.log:/var/www/logs/nginx_access.log
+      - ./logs:/var/www/logs
     depends_on:
       - php
 
